@@ -657,7 +657,45 @@ const GameComponent = () => {
     };
   }, []); // Empty dependency array means this runs once on mount
 
-  return <canvas ref={canvasRef} />;
+  return (
+    <div className="game-container">
+      <canvas ref={canvasRef} />
+  
+      <div className="panel leaderboard">
+        <h3>LEADERBOARD</h3>
+        <div className="score">
+          <span className="score-name">Player1</span>
+          <span className="score-value">1250</span>
+        </div>
+        <div className="score">
+          <span className="score-name">Player2</span>
+          <span className="score-value">980</span>
+        </div>
+        <div className="score">
+          <span className="score-name">Player3</span>
+          <span className="score-value">750</span>
+        </div>
+        <div className="score player-row">
+          <span className="score-name">YOU</span>
+          <span id="player-high-score" className="score-value">0</span>
+        </div>
+      </div>
+  
+      <div className="panel controls">
+        <h3>CONTROLS</h3>
+        <div className="control">
+          <span className="key">↑</span> Jump (double tap for double jump)
+        </div>
+        <div className="control">
+          <span className="key">↑→</span> Jump right
+        </div>
+        <div className="control">
+          <span className="key">↓</span> Roll to destroy enemies
+        </div>
+      </div>
+    </div>
+  );
+  
 };
 
 export default GameComponent;
