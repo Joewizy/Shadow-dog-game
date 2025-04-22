@@ -11,3 +11,99 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.game-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  background-color: #333;
+}
+
+#canvas1 {
+  border: 2px solid black;
+  background-color: #87ceeb;
+  max-width: 100%;
+  max-height: 100vh;
+}
+
+.panel {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 15px;
+  border-radius: 8px;
+  width: 200px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.controls {
+  bottom: 20px;
+  right: 20px;
+}
+
+.leaderboard {
+  top: 20px;
+  right: 20px;
+}
+
+h3 {
+  margin: 0 0 15px 0;
+  color: #4fc3f7;
+  text-align: center;
+  font-size: 18px;
+  border-bottom: 1px solid #4fc3f7;
+  padding-bottom: 5px;
+}
+
+.control {
+  margin: 8px 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.key {
+  font-weight: bold;
+  color: #ffcc00;
+  background: rgba(255, 204, 0, 0.2);
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-right: 10px;
+  min-width: 20px;
+  text-align: center;
+  display: inline-block;
+}
+
+.score {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.score:last-child {
+  border-bottom: none;
+  font-weight: bold;
+}
+
+.score-name {
+  color: #4fc3f7;
+}
+
+#player-high-score {
+  color: #ffcc00;
+}
+
+.score-value {
+  font-family: 'Courier New', monospace;
+}
+
+.player-row {
+  background: rgba(255, 204, 0, 0.1);
+  border-radius: 4px;
+}

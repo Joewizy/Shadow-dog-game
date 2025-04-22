@@ -1,23 +1,24 @@
 import logo from './logo.svg';
 import './App.css';
+import { usePrivy } from '@privy-io/react-auth';
+import GameComponent from './components/GameComponent';
 
 function App() {
+  const { login, authenticated, ready } = usePrivy();
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {ready && authenticated ? (
+        <GameComponent />
+      ) : (
+        <header className="App-header">
+          <img src={logo} className="App-logo" alt="logo" />
+          <p>Welcome to the Shadow Dog Game</p>
+          <button onClick={login} style={{ padding: '10px 20px', fontSize: '16px' }}>
+            Connect Wallet to Play
+          </button>
+        </header>
+      )}
     </div>
   );
 }
