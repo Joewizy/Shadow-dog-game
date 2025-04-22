@@ -1,7 +1,8 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 const GameComponent = () => {
   const canvasRef = useRef(null);
+  const [highScore, setHighScore] = useState(() => localStorage.getItem('highScore') || 0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -12,7 +13,6 @@ const GameComponent = () => {
     // Game state variables
     let gameOver = false;
     let soundEnabled = true;
-    let highScore = localStorage.getItem('highScore') || 0;
     let totalCoinsCollected = 0;
     let numberOfRolls = 10;
     let gameSpeed = 0;
@@ -493,6 +493,7 @@ const GameComponent = () => {
         ctx.fillText(`High Score: ${highScore}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 3 + 140);
         ctx.fillText('Game Over', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 3 + 50);
         ctx.fillText('Press Enter to RESTART', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 3 + 100);
+        window.cancelAnimationFrame(animationFrameId);
         return;
       }
 
@@ -590,8 +591,8 @@ const GameComponent = () => {
             soundManager.play('check');
           }
           if (score > highScore) {
-            highScore = score;
-            localStorage.setItem('highScore', highScore);
+            setHighScore(score);
+            localStorage.setItem('highScore', score);
           }
           if (defaultSpeed < 6) {
             defaultSpeed += 0.1;
@@ -677,7 +678,7 @@ const GameComponent = () => {
         </div>
         <div className="score player-row">
           <span className="score-name">YOU</span>
-          <span id="player-high-score" className="score-value">0</span>
+          <span id="player-high-score" className="score-value">{highScore}</span>
         </div>
       </div>
   
