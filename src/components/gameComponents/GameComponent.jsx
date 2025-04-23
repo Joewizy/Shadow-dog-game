@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import "./GameComponentStyles.css";
 
 const GameComponent = () => {
   const canvasRef = useRef(null);

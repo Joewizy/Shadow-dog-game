@@ -1,38 +1,167 @@
-.App {
-  text-align: center;
+/* Fix for preventing scroll */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* Prevent scrolling */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* App container styling */
+.app {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #302344;
+  background-size: 100% 100%; /* Ensure the background covers the entire area */
+  background-position: center;
+  animation: backgroundShift 12s ease infinite;
+  font-family: 'Arial', sans-serif;
+  color: white;
+  position: relative;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+/* Keyframes for background shift */
+@keyframes backgroundShift {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Main content and other styles (no changes here) */
+.main-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  padding: 2rem;
+  margin-top: 60px;
+}
+
+.game-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  text-align: center;
+}
+
+/* Pre-game and other content styling remains unchanged */
+.pre-game {
+  background: rgba(123, 63, 228, 0.1);
+  border-radius: 16px;
+  padding: 3rem;
+  margin: 2rem auto;
+  max-width: 480px;
+  text-align: center;
+  border: 1px solid rgba(123, 63, 228, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.pre-game h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.username-highlight {
+  color: var(--primary-400);
+  font-weight: 700;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.pre-game-text {
+  color: var(--neutral-300);
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+/* Button styling */
+.play-button {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+  color: white;
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.play-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(123, 63, 228, 0.3);
+}
+
+.welcome-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 100px);
+  padding: 2rem;
+}
+
+.welcome-content {
+  text-align: center;
+  max-width: 600px;
+}
+
+.welcome-screen h1 {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--primary-400), var(--primary-600));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.welcome-text {
+  color: var(--neutral-300);
+  font-size: 1.2rem;
+  margin-bottom: 2.5rem;
+}
+
+.connect-button {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+  color: white;
+  border: none;
+  padding: 1.2rem 2.5rem;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.connect-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(123, 63, 228, 0.3);
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
   }
-  to {
-    transform: rotate(360deg);
+
+  .welcome-screen h1 {
+    font-size: 2.5rem;
+  }
+
+  .pre-game {
+    padding: 2rem;
+  }
+
+  .wallet-info {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }

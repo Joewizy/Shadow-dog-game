@@ -1,0 +1,74 @@
+/* TopBar styles */
+.topbar-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.topbar-button {
+  background-color: #ffffff;
+  color: #333;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  text-align: center;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+/* Dropdown menu */
+.topbar-dropdown {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  width: 65%;
+  background-color: #ffffff;
+  color: #333;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-weight: bold;
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s; /* Added transition for visibility */
+  opacity: 0; /* Initially hidden */
+  transform: translateY(10px); /* Initial position to fade in */
+  visibility: hidden; /* Initially hidden */
+}
+
+.topbar-dropdown.visible {
+  opacity: 1;
+  transform: translateY(0); 
+  visibility: visible; 
+}
+
+/* Hover effect on Disconnect button */
+.topbar-dropdown:hover {
+  color: #ff4d4f; /* Red color on hover */
+}
+
+/* Add delay to the disappearance of the dropdown */
+.topbar-button:hover + .topbar-dropdown,
+.topbar-dropdown:hover {
+  visibility: visible; /* Keep dropdown visible while hovering over it */
+  opacity: 1;
+  transform: translateY(0); /* Keep dropdown in final position */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* Ensure smooth transition */
+}
+
+/* Add a small padding area to extend the hover zone */
+.topbar-dropdown {
+  padding: 12px 24px;
+}
+
+.topbar-button:hover + .topbar-dropdown {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.2s linear;
+}

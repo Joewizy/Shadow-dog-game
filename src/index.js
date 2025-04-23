@@ -10,7 +10,7 @@ root.render(
   <React.StrictMode>
     <PrivyProvider 
     appId='cm9r5r7we01khjt0mr3c656rf'
-    clientId=''
+    clientId =''
     config={{
       embeddedWallets: {
         createOnLogin: "users-without-wallets"
@@ -25,3 +25,4 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+ 
