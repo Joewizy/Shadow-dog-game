@@ -1,0 +1,221 @@
+.game-leaderboard {
+    background: rgba(75, 35, 150, 0.2);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(123, 63, 228, 0.18);
+    transition: all 0.3s ease;
+    max-width: 800px;
+    width: 100%;
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .leaderboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  
+  .leaderboard-header::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, rgba(123, 63, 228, 0), rgba(123, 63, 228, 1), rgba(123, 63, 228, 0));
+    border-radius: 3px;
+  }
+  
+  .leaderboard-title {
+    color: #fff;
+    font-size: 1.8rem;
+    margin: 0;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-shadow: 0 0 10px rgba(123, 63, 228, 0.5);
+  }
+  
+  .leaderboard-icon {
+    color: #ffcc33;
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 5px rgba(255, 204, 51, 0.7));
+  }
+  
+  .leaderboard-table-container {
+    overflow-x: auto;
+    margin-bottom: 1rem;
+    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  }
+  
+  .leaderboard-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    font-size: 0.95rem;
+  }
+  
+  .leaderboard-table thead tr {
+    height: 2.5rem;
+  }
+  
+  .leaderboard-table th {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    text-align: left;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  
+  .leaderboard-row {
+    height: 3.5rem;
+    background: rgba(123, 63, 228, 0.1);
+    transition: all 0.2s ease;
+  }
+  
+  .leaderboard-row:hover {
+    background: rgba(123, 63, 228, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(123, 63, 228, 0.2);
+  }
+  
+  .leaderboard-row td {
+    padding: 0.75rem 1rem;
+    color: white;
+  }
+  
+  .leaderboard-row td:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+  }
+  
+  .leaderboard-row td:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+  
+  .rank-cell {
+    width: 60px;
+  }
+  
+  .username-cell {
+    font-weight: 600;
+    width: 35%;
+  }
+  
+  .score-cell {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    width: 20%;
+  }
+  
+  .wallet-cell {
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+  }
+  
+  .rank-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+  }
+  
+  .rank-icon {
+    width: 24px;
+    height: 24px;
+    transition: all 0.3s ease;
+  }
+  
+  .rank-icon.gold {
+    color: #FFD700;
+    filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.7));
+  }
+  
+  .rank-icon.silver {
+    color: #C0C0C0;
+    filter: drop-shadow(0 0 3px rgba(192, 192, 192, 0.7));
+  }
+  
+  .rank-icon.bronze {
+    color: #CD7F32;
+    filter: drop-shadow(0 0 3px rgba(205, 127, 50, 0.7));
+  }
+  
+  .rank-1 {
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), rgba(123, 63, 228, 0.1));
+  }
+  
+  .rank-2 {
+    background: linear-gradient(90deg, rgba(192, 192, 192, 0.1), rgba(123, 63, 228, 0.1));
+  }
+  
+  .rank-3 {
+    background: linear-gradient(90deg, rgba(205, 127, 50, 0.1), rgba(123, 63, 228, 0.1));
+  }
+  
+  .view-more-button {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(123, 63, 228, 0.3);
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 0.5rem auto 0;
+  }
+  
+  .view-more-button:hover {
+    background: rgba(123, 63, 228, 0.2);
+    color: white;
+    border-color: rgba(123, 63, 228, 0.5);
+  }
+  
+  @media (max-width: 768px) {
+    .game-leaderboard {
+      padding: 1rem;
+    }
+    
+    .wallet-column, .wallet-cell {
+      display: none;
+    }
+    
+    .leaderboard-title {
+      font-size: 1.5rem;
+    }
+    
+    .leaderboard-table th, .leaderboard-table td {
+      padding: 0.5rem;
+    }
+    
+    .username-cell {
+      max-width: 120px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }

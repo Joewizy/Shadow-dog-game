@@ -4,6 +4,12 @@ body, html {
   padding: 0;
   height: 100%;
   overflow: hidden; /* Prevent scrolling */
+  --primary-400: #ac6dff;
+  --primary-500: #9c4fff;
+  --primary-600: #7b3fe4;
+  --neutral-300: #d1d5db;
+  --neutral-400: #9ca3af;
+  --neutral-500: #6b7280;
 }
 
 /* App container styling */
@@ -13,13 +19,14 @@ body, html {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #302344;
-  background-size: 100% 100%; /* Ensure the background covers the entire area */
+  background: linear-gradient(135deg, #302344, #1e0f35);
+  background-size: 200% 200%;
   background-position: center;
   animation: backgroundShift 12s ease infinite;
   font-family: 'Arial', sans-serif;
   color: white;
   position: relative;
+  overflow: auto;
 }
 
 /* Keyframes for background shift */
@@ -35,7 +42,7 @@ body, html {
   }
 }
 
-/* Main content and other styles (no changes here) */
+/* Main content and other styles */
 .main-content {
   flex: 1;
   display: flex;
@@ -43,6 +50,8 @@ body, html {
   align-items: center;
   padding: 2rem;
   margin-top: 60px;
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
 }
 
 .game-wrapper {
@@ -51,27 +60,92 @@ body, html {
   text-align: center;
 }
 
-/* Pre-game and other content styling remains unchanged */
+/* Welcome container styling */
+.welcome-container {
+  display: flex;
+  margin-bottom: 10px;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pre-game styling */
 .pre-game {
   background: rgba(123, 63, 228, 0.1);
   border-radius: 16px;
   padding: 3rem;
-  margin: 2rem auto;
+  margin: 2rem auto 0;
   max-width: 480px;
   text-align: center;
   border: 1px solid rgba(123, 63, 228, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.pre-game:hover {
+  box-shadow: 0 12px 40px rgba(123, 63, 228, 0.2);
+  transform: translateY(-5px);
+}
+
+.pre-game::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  background: linear-gradient(45deg, rgba(123, 63, 228, 0), rgba(123, 63, 228, 0.3), rgba(123, 63, 228, 0));
+  border-radius: 20px;
+  z-index: -1;
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+  0%, 100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .pre-game h2 {
-  font-size: 2rem;
+  font-size: 2.2rem;
   margin-bottom: 1rem;
   color: white;
+  text-shadow: 0 0 10px rgba(123, 63, 228, 0.5);
 }
 
 .username-highlight {
   color: var(--primary-400);
   font-weight: 700;
+  position: relative;
+  display: inline-block;
+}
+
+.username-highlight::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  bottom: -3px;
+  left: 0;
+  background: linear-gradient(90deg, rgba(123, 63, 228, 0), rgba(123, 63, 228, 1), rgba(123, 63, 228, 0));
+  border-radius: 3px;
 }
 
 .pre-game-text {
@@ -85,21 +159,55 @@ body, html {
   background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
   color: white;
   border: none;
-  padding: 1rem 2.5rem;
-  border-radius: 8px;
+  padding: 1.1rem 2.5rem;
+  border-radius: 30px;
   font-size: 1.2rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  box-shadow: 0 6px 15px rgba(123, 63, 228, 0.3);
+}
+
+.play-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.7s ease;
+  z-index: -1;
 }
 
 .play-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(123, 63, 228, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(123, 63, 228, 0.4);
 }
 
+.play-button:hover::before {
+  left: 100%;
+}
+
+.play-button:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 15px rgba(123, 63, 228, 0.3);
+}
+
+.welcome-leaderboard-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Welcome screen styling */
 .welcome-screen {
   display: flex;
   align-items: center;
@@ -111,40 +219,62 @@ body, html {
 .welcome-content {
   text-align: center;
   max-width: 600px;
+  animation: fadeIn 0.8s ease-out;
 }
 
 .welcome-screen h1 {
-  font-size: 3.5rem;
+  font-size: 4rem;
   margin-bottom: 1rem;
   background: linear-gradient(135deg, var(--primary-400), var(--primary-600));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-shadow: 0 5px 15px rgba(123, 63, 228, 0.3);
 }
 
 .welcome-text {
   color: var(--neutral-300);
-  font-size: 1.2rem;
-  margin-bottom: 2.5rem;
+  font-size: 1.3rem;
+  margin-bottom: 3rem;
 }
 
 .connect-button {
   background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
   color: white;
   border: none;
-  padding: 1.2rem 2.5rem;
-  border-radius: 8px;
+  padding: 1.2rem 2.8rem;
+  border-radius: 30px;
   font-size: 1.2rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  box-shadow: 0 6px 20px rgba(123, 63, 228, 0.3);
+}
+
+.connect-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.7s ease;
+  z-index: -1;
 }
 
 .connect-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(123, 63, 228, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(123, 63, 228, 0.4);
+}
+
+.connect-button:hover::before {
+  left: 100%;
 }
 
 @media (max-width: 768px) {
@@ -153,11 +283,16 @@ body, html {
   }
 
   .welcome-screen h1 {
-    font-size: 2.5rem;
+    font-size: 3rem;
   }
 
   .pre-game {
     padding: 2rem;
+    margin-top: 1rem;
+  }
+
+  .play-button, .connect-button {
+    padding: 1rem 2rem;
   }
 
   .wallet-info {

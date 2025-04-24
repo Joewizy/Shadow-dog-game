@@ -1,31 +1,48 @@
-import React from 'react';
-import './App.css';
+import React, { useState, useEffect } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
-import GameComponent from '../src/components/gameComponents/GameComponent'; 
-import Username from '../src/components/usernameComponents/Username';
-import { useState, useEffect } from 'react';
+import GameComponent from './components/gameComponents/GameComponent'; 
+import Username from './components/usernameComponents/Username';
 import TopBar from './components/topBarComponents/TopBar';
+import Web3 from './contract/web3';
+import { GameLeaderboard } from './components/leaderComponents/GameLeaderboard';
+import './App.css';
 
 function App() {
   const { login, authenticated, ready, user, logout } = usePrivy();
+  const { createUsername, hasUsername, createUsernameGasless, isInitialize } = Web3();
   const walletAddress = user?.wallet?.address;
-  
+
   const [username, setUsername] = useState('');
   const [readyToPlay, setReadyToPlay] = useState(false);
 
-  useEffect(() => {
-    if (walletAddress) {
-      const savedUsername = localStorage.getItem(`username-${walletAddress}`);
-      if (savedUsername) {
-        setUsername(savedUsername);
+  const handleUsernameSet = async (newUsername) => {
+    try {
+      const success = await createUsernameGasless(newUsername);
+      if (success) {
+        setUsername(newUsername);
+      } else {
+        console.error("Error setting username on blockchain");
       }
+    } catch (error) {
+      console.error("Error setting username:", error);
     }
-  }, [walletAddress]);
-
-  const handleUsernameSet = (newUsername) => {
-    localStorage.setItem(`username-${walletAddress}`, newUsername);
-    setUsername(newUsername);
   };
+
+  useEffect(() => {
+    const checkUsername = async () => {
+      if (walletAddress && isInitialize) {
+        console.log('Checking username for address:', walletAddress);
+        const usernameExists = await hasUsername(walletAddress);
+        console.log('Username exists:', usernameExists);
+        if (usernameExists) {
+          const blockchainUsername = await hasUsername(walletAddress); 
+          setUsername(blockchainUsername);
+        }
+      }
+    };
+
+    checkUsername(); 
+  }, [walletAddress, isInitialize]);
 
   return (
     <div className="app">
@@ -37,15 +54,20 @@ function App() {
             {!username ? (
               <Username onUsernameSet={handleUsernameSet} />
             ) : !readyToPlay ? (
-              <div className="pre-game">
-                <h2>Welcome, <span className="username-highlight">{username}</span>!</h2>
-                <p className="pre-game-text">Your adventure awaits. Are you ready to begin?</p>
-                <button
-                  className="play-button"
-                  onClick={() => setReadyToPlay(true)}
-                >
-                  PLAY NOW
-                </button>
+              <div className="welcome-container">
+                <div className="pre-game">
+                  <h2>Welcome, <span className="username-highlight">{username}</span>!</h2>
+                  <p className="pre-game-text">Your adventure awaits. Are you ready to begin?</p>
+                  <button
+                    className="play-button"
+                    onClick={() => setReadyToPlay(true)}
+                  >
+                    PLAY NOW
+                  </button>
+                </div>
+                <div className="welcome-leaderboard-container">
+                  <GameLeaderboard />
+                </div>
               </div>
             ) : (
               <GameComponent />

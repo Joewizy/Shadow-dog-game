@@ -1,9 +1,8 @@
-"use client"
+import React, { useState, useEffect } from "react";
+import { Trophy, Medal, Crown, Award } from "lucide-react";
+import "./GameLeaderboard.css";
 
-import { useState, useEffect } from "react"
-import { Trophy, Medal } from "lucide-react"
-
-// Mock data - in a real app, this would come from your backend
+// Mock data for the leaderboard
 const mockLeaderboard = [
   {
     id: "1",
@@ -40,41 +39,45 @@ const mockLeaderboard = [
     walletAddress: "0x567890abcdef1234567890abcdef1234567890abc",
     rank: 5,
   },
-]
+];
 
-export function Leaderboard() {
-  const [leaderboard, setLeaderboard] = useState(mockLeaderboard)
+export function GameLeaderboard() {
+  const [leaderboard, setLeaderboard] = useState(mockLeaderboard);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // In a real app, you would fetch the leaderboard data here
   useEffect(() => {
     // Fetch leaderboard data
     // Example: fetchLeaderboard().then(data => setLeaderboard(data))
-  }, [])
+  }, []);
 
   const truncateAddress = (address) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
-  }
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
   const getRankIcon = (rank) => {
     switch (rank) {
       case 1:
-        return <Trophy className="rank-icon gold" />
+        return <Crown className="rank-icon gold" />;
       case 2:
-        return <Trophy className="rank-icon silver" />
+        return <Medal className="rank-icon silver" />;
       case 3:
-        return <Trophy className="rank-icon bronze" />
+        return <Medal className="rank-icon bronze" />;
       default:
-        return <span className="rank-number">{rank}</span>
+        return <Award className="rank-icon" />;
     }
-  }
+  };
+
+  const displayRows = isExpanded ? leaderboard : leaderboard.slice(0, 3);
 
   return (
-    <div className="leaderboard-container">
+    <div className="game-leaderboard">
       <div className="leaderboard-header">
         <h2 className="leaderboard-title">
-          <Medal className="leaderboard-icon" /> Leaderboard
+          <Trophy className="leaderboard-icon" /> Top Players
         </h2>
       </div>
+      
       <div className="leaderboard-table-container">
         <table className="leaderboard-table">
           <thead>
@@ -86,8 +89,8 @@ export function Leaderboard() {
             </tr>
           </thead>
           <tbody>
-            {leaderboard.map((entry) => (
-              <tr key={entry.id} className={entry.rank <= 3 ? "top-rank" : ""}>
+            {displayRows.map((entry) => (
+              <tr key={entry.id} className={`leaderboard-row rank-${entry.rank}`}>
                 <td className="rank-cell">
                   <div className="rank-icon-container">{getRankIcon(entry.rank)}</div>
                 </td>
@@ -99,6 +102,15 @@ export function Leaderboard() {
           </tbody>
         </table>
       </div>
+      
+      {leaderboard.length > 3 && (
+        <button 
+          className="view-more-button" 
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? "Show Less" : "View More"}
+        </button>
+      )}
     </div>
-  )
+  );
 }

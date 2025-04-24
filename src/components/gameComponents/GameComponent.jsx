@@ -1,9 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react';
 import "./GameComponentStyles.css";
+import Web3 from '../../contract/web3';
 
 const GameComponent = () => {
   const canvasRef = useRef(null);
   const [highScore, setHighScore] = useState(() => localStorage.getItem('highScore') || 0);
+  const { updateScoreGasless } = Web3();
 
   useEffect(() => {
     const canvas = canvasRef.current;

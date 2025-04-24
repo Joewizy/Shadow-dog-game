@@ -15,7 +15,7 @@ const Username = ({ onUsernameSet }) => {
   return (
     <div className="username-container">
       <h2>Choose Your Username</h2>
-      <p className="username-subtitle">Enter a username to start playing</p>
+      <p className="username-subtitle">Username can only be set once!</p>
       <form onSubmit={handleSubmit} className="username-form">
         <div className="input-group">
           <input
