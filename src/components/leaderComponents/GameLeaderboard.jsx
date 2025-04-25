@@ -1,57 +1,71 @@
 import React, { useState, useEffect } from "react";
 import { Trophy, Medal, Crown, Award } from "lucide-react";
+import Web3 from "../../contract/web3";
 import "./GameLeaderboard.css";
 
-// Mock data for the leaderboard
-const mockLeaderboard = [
-  {
-    id: "1",
-    username: "ShadowMaster",
-    score: 9850,
-    walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
-    rank: 1,
-  },
-  {
-    id: "2",
-    username: "CryptoNinja",
-    score: 8720,
-    walletAddress: "0xabcdef1234567890abcdef1234567890abcdef12",
-    rank: 2,
-  },
-  {
-    id: "3",
-    username: "BlockchainWarrior",
-    score: 7650,
-    walletAddress: "0x7890abcdef1234567890abcdef1234567890abcd",
-    rank: 3,
-  },
-  {
-    id: "4",
-    username: "TokenHunter",
-    score: 6540,
-    walletAddress: "0xdef1234567890abcdef1234567890abcdef123456",
-    rank: 4,
-  },
-  {
-    id: "5",
-    username: "Web3Legend",
-    score: 5430,
-    walletAddress: "0x567890abcdef1234567890abcdef1234567890abc",
-    rank: 5,
-  },
-];
-
 export function GameLeaderboard() {
-  const [leaderboard, setLeaderboard] = useState(mockLeaderboard);
+  const [leaderboard, setLeaderboard] = useState([]);
   const [isExpanded, setIsExpanded] = useState(false);
+  const { getAllLeaderboard, hasUsername, isInitialize } = Web3();
 
-  // In a real app, you would fetch the leaderboard data here
   useEffect(() => {
-    // Fetch leaderboard data
-    // Example: fetchLeaderboard().then(data => setLeaderboard(data))
-  }, []);
+    const fetchLeaderboardData = async () => {
+      if (!isInitialize) {
+        console.log("Web3 not initialized yet");
+        return;
+      }
+
+      try {
+        console.log("Fetching on-chain leaderboard...");
+        const onChainLeaderboard = await getAllLeaderboard();
+        console.log("Raw leaderboard from contract:", onChainLeaderboard);
+
+        const players = onChainLeaderboard[0]; 
+        const scores = onChainLeaderboard[1];  
+
+        if (players.length !== scores.length) {
+          console.error("Mismatch between players and scores arrays");
+          return;
+        }
+
+        // Combine the arrays into a structured format
+        const structured = players.map((player, index) => ({
+          player,
+          score: scores[index],
+        }));
+
+        // Enrich the leaderboard with usernames and additional metadata
+        const enrichedLeaderboard = await Promise.all(
+          structured.map(async (entry, index) => {
+            const username = await hasUsername(entry.player);
+            console.log(`User ${entry.player} has username:`, username);
+            return {
+              id: index.toString(),
+              username: username || "Anonymous",
+              score: Number(entry.score), 
+              walletAddress: entry.player,
+              rank: index + 1,
+            };
+          })
+        );
+
+        // Filter out any invalid entries
+        const filteredLeaderboard = enrichedLeaderboard.filter(Boolean);
+        filteredLeaderboard.sort((a, b) => b.score - a.score);
+        filteredLeaderboard.forEach((entry, i) => (entry.rank = i + 1));
+
+        console.log("Final leaderboard:", filteredLeaderboard);
+        setLeaderboard(filteredLeaderboard);
+      } catch (error) {
+        console.error("Error fetching leaderboard:", error);
+      }
+    };
+
+    fetchLeaderboardData();
+  }, [isInitialize]);
 
   const truncateAddress = (address) => {
+    if (!address || typeof address !== "string") return "N/A";
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
@@ -77,7 +91,7 @@ export function GameLeaderboard() {
           <Trophy className="leaderboard-icon" /> Top Players
         </h2>
       </div>
-      
+
       <div className="leaderboard-table-container">
         <table className="leaderboard-table">
           <thead>
@@ -102,10 +116,10 @@ export function GameLeaderboard() {
           </tbody>
         </table>
       </div>
-      
+
       {leaderboard.length > 3 && (
-        <button 
-          className="view-more-button" 
+        <button
+          className="view-more-button"
           onClick={() => setIsExpanded(!isExpanded)}
         >
           {isExpanded ? "Show Less" : "View More"}

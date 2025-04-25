@@ -48,7 +48,7 @@ function App() {
 
   return (
     <div className="app">
-      <Toaster position="top-right" /> 
+      <Toaster position="top-left" /> 
       <TopBar authenticated={authenticated} user={user} login={login} logout={logout} />
       
       <main className="main-content">
@@ -79,6 +79,7 @@ function App() {
         ) : (
           <div className="welcome-screen">
             <div className="welcome-content">
+              <img src='assets/images/heropic.jpg' className='hero-image' alt="Shadow Dog hero" />
               <h1>Shadow Dog Game</h1>
               <p className="welcome-text">Connect your wallet to embark on an epic adventure</p>
               <button className="connect-button" onClick={login}>
