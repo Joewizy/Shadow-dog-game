@@ -6,7 +6,6 @@ import TopBar from './components/topBarComponents/TopBar';
 import Web3 from './contract/web3';
 import { GameLeaderboard } from './components/leaderComponents/GameLeaderboard';
 import './App.css';
-import toast from 'react-hot-toast';
 import { Toaster } from 'react-hot-toast';
 
 
@@ -45,7 +44,7 @@ function App() {
     };
 
     checkUsername(); 
-  }, [walletAddress, isInitialize]);
+  }, [walletAddress, isInitialize, hasUsername]);
 
   return (
     <div className="app">
