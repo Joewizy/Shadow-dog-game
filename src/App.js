@@ -6,10 +6,13 @@ import TopBar from './components/topBarComponents/TopBar';
 import Web3 from './contract/web3';
 import { GameLeaderboard } from './components/leaderComponents/GameLeaderboard';
 import './App.css';
+import toast from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
+
 
 function App() {
   const { login, authenticated, ready, user, logout } = usePrivy();
-  const { createUsername, hasUsername, createUsernameGasless, isInitialize } = Web3();
+  const { hasUsername, createUsernameGasless, isInitialize } = Web3();
   const walletAddress = user?.wallet?.address;
 
   const [username, setUsername] = useState('');
@@ -46,6 +49,7 @@ function App() {
 
   return (
     <div className="app">
+      <Toaster position="top-right" /> 
       <TopBar authenticated={authenticated} user={user} login={login} logout={logout} />
       
       <main className="main-content">

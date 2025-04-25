@@ -2,6 +2,7 @@ import { BrowserProvider, Contract, Interface, Wallet } from "ethers";
 import { useEffect, useState } from "react";
 import { gameAbi, gameContractAddress, forwarderAbi, forwarderContractAdress } from "./abi.js";
 import { usePrivy } from "@privy-io/react-auth";
+import toast from 'react-hot-toast';
 
 // EIP712 Domain and Types
 const EIP712Domain = [
@@ -238,6 +239,7 @@ const Web3 = () => {
       
       if (txHash) {
         console.log("✅ Username set via meta-transaction:", txHash);
+        toast.success("Username successfully registered")
         return true;
       }
       
@@ -287,6 +289,7 @@ const Web3 = () => {
       
       if (txHash) {
         console.log("✅ Score updated via meta-transaction:", txHash);
+        toast.success("Score successfully updated on chain")
         return true;
       }
       
@@ -371,14 +374,12 @@ const Web3 = () => {
     signer,
     contract,
     userAddress,
-    // Original methods
     createUsername,
     updateScore,
     getScore,
     getLeaderboard,
     getAllLeaderboard,
     hasUsername,
-    // Gasless methods
     createUsernameGasless,
     updateScoreGasless,
     isAuthenticated: authenticated,

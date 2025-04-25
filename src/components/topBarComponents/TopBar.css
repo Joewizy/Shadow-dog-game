@@ -4,6 +4,7 @@
   top: 20px;
   right: 20px;
   font-family: Arial, sans-serif;
+  z-index: 1000;
 }
 
 .topbar-button {
@@ -18,14 +19,16 @@
   text-align: center;
   font-weight: bold;
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 1001;
 }
 
 /* Dropdown menu */
 .topbar-dropdown {
   position: absolute;
   top: calc(100% + 2px);
-  left: 0;
-  width: 65%;
+  right: 0; /* Changed from left:0 to right:0 to align with the button */
+  width: 65%; /* Changed from 65% to 100% for better alignment */
   background-color: #ffffff;
   color: #333;
   padding: 12px 24px;
@@ -35,10 +38,11 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
   font-weight: bold;
-  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s; /* Added transition for visibility */
-  opacity: 0; /* Initially hidden */
-  transform: translateY(10px); /* Initial position to fade in */
-  visibility: hidden; /* Initially hidden */
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  opacity: 0;
+  transform: translateY(10px);
+  visibility: hidden;
+  z-index: 1001; /* Same z-index as button */
 }
 
 .topbar-dropdown.visible {

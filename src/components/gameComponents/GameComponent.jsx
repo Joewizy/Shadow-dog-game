@@ -1,32 +1,73 @@
 import React, { useRef, useEffect, useState } from 'react';
 import "./GameComponentStyles.css";
 import Web3 from '../../contract/web3';
+import { usePrivy } from '@privy-io/react-auth';
 
 const GameComponent = () => {
   const canvasRef = useRef(null);
-  const [highScore, setHighScore] = useState(() => localStorage.getItem('highScore') || 0);
-  const { updateScoreGasless } = Web3();
+  const isGameOverRef = useRef(false);
+  const highScoreOnCanvasRef = useRef(0);
+  const [score, setScore] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+  const [highScore, setHighScore] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const { getScore, updateScoreGasless, isInitialize } = Web3();
+  const { user } = usePrivy();
+  const walletAddress = user?.wallet?.address;
+
+  useEffect(() => {
+    highScoreOnCanvasRef.current = highScore;
+  }, [highScore]);
+
+  useEffect(() => {
+    const fetchHighScore = async () => {
+      if (walletAddress && isInitialize) {
+        try {
+          const userHighScore = await getScore(walletAddress);
+          console.log(`User highscore is ${userHighScore}`);
+          setHighScore(Number(userHighScore) || 0);
+        } catch (error) {
+          console.error("Error fetching high score:", error);
+        }
+      }
+    };
+
+    fetchHighScore();
+  }, [walletAddress, isInitialize, getScore]);
+
+  const handleUpdateScore = async () => {
+    if (!walletAddress || !isInitialize || score <= highScore) return;
+    setIsUpdating(true);
+    try {
+      const tx = await updateScoreGasless(score);
+      console.log("Score updated", tx);
+      setHighScore(score);
+      if (tx) {
+        setIsUpdating(false);
+      }
+    } catch (error) {
+      console.error("Error updating user high score:", error);
+      setIsUpdating(false);
+    }
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    const CANVAS_WIDTH = canvas.width = 800;
-    const CANVAS_HEIGHT = canvas.height = 700;
+    const CANVAS_WIDTH = (canvas.width = 800);
+    const CANVAS_HEIGHT = (canvas.height = 700);
 
-    // Game state variables
-    let gameOver = false;
+    let scoreOnCanvas = 0;
     let soundEnabled = true;
     let totalCoinsCollected = 0;
     let numberOfRolls = 10;
     let gameSpeed = 0;
-    let score = 0;
     let defaultSpeed = 2;
     gameSpeed = defaultSpeed;
     let playerState = 'run';
     let gameFrame = 0;
     const staggerFrames = 5;
 
-    // Sound manager
     const soundManager = {
       sounds: {
         roll: new Audio('../assets/sounds/hit.mp3'),
@@ -34,26 +75,25 @@ const GameComponent = () => {
         hit: new Audio('../assets/sounds/death.mp3'),
         check: new Audio('../assets/sounds/check.mp3'),
       },
-      play: function(soundName) {
+      play: function (soundName) {
         if (!soundEnabled) return;
         const sound = this.sounds[soundName].cloneNode();
         sound.volume = 0.5;
-        sound.play().catch(e => console.log(`Failed to play ${soundName} sound:`, e));
+        sound.play().catch((e) => console.log(`Failed to play ${soundName} sound:`, e));
       },
-      stopAll: function() {
-        Object.values(this.sounds).forEach(sound => {
+      stopAll: function () {
+        Object.values(this.sounds).forEach((sound) => {
           sound.pause();
           sound.currentTime = 0;
         });
       },
-      toggle: function() {
+      toggle: function () {
         soundEnabled = !soundEnabled;
         if (!soundEnabled) this.stopAll();
         return soundEnabled;
-      }
+      },
     };
 
-    // Image assets
     const playerImage = new Image();
     playerImage.src = '../assets/images/shadow-dog.png';
     const backgroundLayer1 = new Image();
@@ -71,7 +111,6 @@ const GameComponent = () => {
     const pain = new Image();
     pain.src = '../assets/images/pain-meme.jpg';
 
-    // Sprite animation setup
     const spriteWidth = 575;
     const spriteHeight = 523;
     const spriteAnimations = {};
@@ -82,7 +121,7 @@ const GameComponent = () => {
       { name: 'run', frames: 9 },
       { name: 'dizzy', frames: 11 },
       { name: 'sit', frames: 5 },
-      { name: 'roll', frames: 7 }
+      { name: 'roll', frames: 7 },
     ];
 
     animationStates.forEach((state, index) => {
@@ -95,7 +134,6 @@ const GameComponent = () => {
       spriteAnimations[state.name] = frames;
     });
 
-    // Game object classes
     class Layer {
       constructor(image, speedModifier) {
         this.x = 0;
@@ -129,7 +167,7 @@ const GameComponent = () => {
         this.height = this.spriteHeight / 3;
         this.index = index;
         this.enemySpacing = 4000;
-        this.x = CANVAS_WIDTH + (this.index * this.enemySpacing);
+        this.x = CANVAS_WIDTH + this.index * this.enemySpacing;
         this.y = Math.random() * (300 - 120) + 120;
         this.speed = Math.random() * 1 + 2;
         this.angle = 0;
@@ -151,7 +189,7 @@ const GameComponent = () => {
           this.angle += this.angleSpeed;
           if (this.x + this.width < 0) {
             let rightmostX = 0;
-            enemiesArray.forEach(enemy => {
+            enemiesArray.forEach((enemy) => {
               if (enemy !== this && enemy.x > rightmostX) {
                 rightmostX = enemy.x;
               }
@@ -177,13 +215,17 @@ const GameComponent = () => {
       }
       draw() {
         if (this.state === 'normal') {
-          ctx.globalAlpha = 1 - (this.disappearFrame / this.disappearFrameEffect);
+          ctx.globalAlpha = 1 - this.disappearFrame / this.disappearFrameEffect;
           ctx.drawImage(
             this.image,
-            this.frame * this.spriteWidth, 0,
-            this.spriteWidth, this.spriteHeight,
-            this.x, this.y,
-            this.width, this.height
+            this.frame * this.spriteWidth,
+            0,
+            this.spriteWidth,
+            this.spriteHeight,
+            this.x,
+            this.y,
+            this.width,
+            this.height
           );
           ctx.globalAlpha = 1;
         }
@@ -217,7 +259,7 @@ const GameComponent = () => {
           this.x -= this.speed;
           if (this.x + this.width < 0) {
             let rightmostX = 0;
-            ghostArray.forEach(ghost => {
+            ghostArray.forEach((ghost) => {
               if (ghost !== this && ghost.x > rightmostX) {
                 rightmostX = ghost.x;
               }
@@ -239,12 +281,17 @@ const GameComponent = () => {
       }
       draw() {
         if (this.state === 'normal') {
-          ctx.globalAlpha = 1 - (this.disappearFrame / this.disappearFrameEffect);
+          ctx.globalAlpha = 1 - this.disappearFrame / this.disappearFrameEffect;
           ctx.drawImage(
-            this.image, 0, 0,
-            this.ghostWidth, this.ghostHeight,
-            this.x, this.y,
-            this.width, this.height
+            this.image,
+            0,
+            0,
+            this.ghostWidth,
+            this.ghostHeight,
+            this.x,
+            this.y,
+            this.width,
+            this.height
           );
           ctx.globalAlpha = 1;
         }
@@ -299,10 +346,14 @@ const GameComponent = () => {
         let frameY = spriteAnimations[playerState].loc[position].y;
         ctx.drawImage(
           playerImage,
-          frameX, frameY,
-          spriteWidth, spriteHeight,
-          this.x, this.y,
-          this.width, this.height
+          frameX,
+          frameY,
+          spriteWidth,
+          spriteHeight,
+          this.x,
+          this.y,
+          this.width,
+          this.height
         );
       }
       update() {
@@ -366,7 +417,6 @@ const GameComponent = () => {
       }
     }
 
-    // Instantiate game objects
     const player = new Player();
     const background1 = new Layer(backgroundLayer1, 10);
     const background2 = new Layer(backgroundLayer2, 20);
@@ -393,11 +443,10 @@ const GameComponent = () => {
       coinsArray.push(new Coin());
     }
 
-    // Input handling
     const keys = {};
 
     const handleKeyDown = (event) => {
-      if (event.key === 'Enter' && gameOver) {
+      if (event.key === 'Enter' && isGameOverRef.current) {
         resetGame();
       }
       keys[event.code] = true;
@@ -419,9 +468,10 @@ const GameComponent = () => {
       const rect = canvas.getBoundingClientRect();
       const mouseX = event.clientX - rect.left;
       const mouseY = event.clientY - rect.top;
-      const buttonX = CANVAS_WIDTH - 50;
-      const buttonY = 30;
-      const distance = Math.sqrt(Math.pow(mouseX - buttonX, 2) + Math.pow(mouseY - buttonY, 2));
+
+      const soundButtonX = CANVAS_WIDTH - 50;
+      const soundButtonY = 30;
+      const distance = Math.sqrt(Math.pow(mouseX - soundButtonX, 2) + Math.pow(mouseY - soundButtonY, 2));
       if (distance <= 20) {
         soundManager.toggle();
       }
@@ -431,7 +481,6 @@ const GameComponent = () => {
     window.addEventListener('keyup', handleKeyUp);
     canvas.addEventListener('click', handleClick);
 
-    // Utility functions
     const checkCollision = (rect1, rect2) => {
       return (
         rect1.x < rect2.x + rect2.width &&
@@ -478,24 +527,41 @@ const GameComponent = () => {
       ctx.stroke();
     };
 
-    // Game loop
     let animationFrameId;
 
     const render = () => {
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-      if (gameOver) {
+      if (isGameOverRef.current) {
         playerState = 'dizzy';
+
         ctx.drawImage(pain, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'; 
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        
+        // Game Over text
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 45px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('GAME OVER', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 3);
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(CANVAS_WIDTH / 2 - 150, CANVAS_HEIGHT / 3 + 20, 300, 150);
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(CANVAS_WIDTH / 2 - 150, CANVAS_HEIGHT / 3 + 20, 300, 150);
+        
+        // Score text
         ctx.fillStyle = 'white';
         ctx.font = '30px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(`Your Score: ${score}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 3);
-        ctx.fillText(`High Score: ${highScore}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 3 + 140);
-        ctx.fillText('Game Over', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 3 + 50);
-        ctx.fillText('Press Enter to RESTART', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 3 + 100);
+        ctx.fillText(`Your Score: ${scoreOnCanvas}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 3 + 70);
+        ctx.fillText(`High Score: ${highScoreOnCanvasRef.current}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 3 + 120);
+        
+        // Restart text
+        ctx.font = '25px Arial';
+        ctx.fillText('Press Enter to RESTART', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 3 + 200);
+        
+        console.log('Game Over - score:', score, 'highScore:', highScore, 'shouldShowButton:', score > highScore);
         window.cancelAnimationFrame(animationFrameId);
         return;
       }
@@ -511,33 +577,36 @@ const GameComponent = () => {
       enemiesArray.forEach((enemy) => {
         enemy.update();
         enemy.draw();
-        if (checkCollision(
-          { x: player.x, y: player.y, width: player.width, height: player.height },
-          { x: enemy.x, y: enemy.y, width: enemy.width, height: enemy.height }
-        )) {
+        if (
+          checkCollision(
+            { x: player.x, y: player.y, width: player.width, height: player.height },
+            { x: enemy.x, y: enemy.y, width: enemy.width, height: enemy.height }
+          )
+        ) {
           if (playerState !== 'roll') {
             soundManager.play('hit');
             soundManager.stopAll();
             console.log('Game Over!');
-            gameOver = true;
+            isGameOverRef.current = true;
+            setGameOver(true);
           } else {
             enemy.state = 'disappear';
-            score += 5;
+            scoreOnCanvas += 5;
+            setScore((prev) => prev + 5);
           }
         }
       });
-      enemiesArray = enemiesArray.filter(enemy => !enemy.remove);
+      enemiesArray = enemiesArray.filter((enemy) => !enemy.remove);
       const maxEnemies = Math.min(numberOfEnemies, 20);
       while (enemiesArray.length < maxEnemies) {
         let rightmostX = 0;
-        enemiesArray.forEach(enemy => {
+        enemiesArray.forEach((enemy) => {
           if (enemy.x > rightmostX) {
             rightmostX = enemy.x;
           }
         });
-        let newX = rightmostX > 0 ?
-          rightmostX + 1200 + Math.random() * 600 :
-          CANVAS_WIDTH + Math.random() * 1000 + 1000;
+        let newX =
+          rightmostX > 0 ? rightmostX + 1200 + Math.random() * 600 : CANVAS_WIDTH + Math.random() * 1000 + 1000;
         let enemy = new Enemy(enemiesArray.length);
         enemy.x = newX;
         enemiesArray.push(enemy);
@@ -546,32 +615,34 @@ const GameComponent = () => {
       ghostArray.forEach((ghost) => {
         ghost.update();
         ghost.draw();
-        if (checkCollision(
-          { x: player.x, y: player.y, width: player.width, height: player.height },
-          { x: ghost.x, y: ghost.y, width: ghost.width, height: ghost.height }
-        )) {
+        if (
+          checkCollision(
+            { x: player.x, y: player.y, width: player.width, height: player.height },
+            { x: ghost.x, y: ghost.y, width: ghost.width, height: ghost.height }
+          )
+        ) {
           if (playerState === 'roll' && ghost.state === 'normal') {
             ghost.state = 'disappear';
-            score += 5;
+            scoreOnCanvas += 5;
+            setScore((prev) => prev + 5);
           } else if (ghost.state === 'normal') {
             soundManager.play('hit');
             console.log('Game Over!');
-            gameOver = true;
+            isGameOverRef.current = true;
+            setGameOver(true);
           }
         }
       });
-      ghostArray = ghostArray.filter(ghost => !ghost.remove);
+      ghostArray = ghostArray.filter((ghost) => !ghost.remove);
       const maxGhosts = Math.min(numberOfGhost, 15);
       while (ghostArray.length < maxGhosts) {
         let rightmostX = 0;
-        ghostArray.forEach(ghost => {
+        ghostArray.forEach((ghost) => {
           if (ghost.x > rightmostX) {
             rightmostX = ghost.x;
           }
         });
-        let newX = rightmostX > 0 ?
-          rightmostX + 800 + Math.random() * 400 :
-          CANVAS_WIDTH + Math.random() * 800;
+        let newX = rightmostX > 0 ? rightmostX + 800 + Math.random() * 400 : CANVAS_WIDTH + Math.random() * 800;
         let ghost = new Ghost(ghostArray.length);
         ghost.x = newX;
         ghostArray.push(ghost);
@@ -580,22 +651,21 @@ const GameComponent = () => {
       coinsArray.forEach((coin) => {
         coin.update();
         coin.draw();
-        if (checkCollision(
-          { x: player.x, y: player.y, width: player.width, height: player.height },
-          { x: coin.x, y: coin.y, width: coin.radius * 2, height: coin.radius * 2 }
-        )) {
+        if (
+          checkCollision(
+            { x: player.x, y: player.y, width: player.width, height: player.height },
+            { x: coin.x, y: coin.y, width: coin.radius * 2, height: coin.radius * 2 }
+          )
+        ) {
           soundManager.play('coin');
           coin.collected = true;
-          score += 10;
+          scoreOnCanvas += 10;
+          setScore((prev) => prev + 10);
           totalCoinsCollected++;
           if (totalCoinsCollected >= 10) {
             numberOfRolls++;
             totalCoinsCollected = 0;
             soundManager.play('check');
-          }
-          if (score > highScore) {
-            setHighScore(score);
-            localStorage.setItem('highScore', score);
           }
           if (defaultSpeed < 6) {
             defaultSpeed += 0.1;
@@ -608,7 +678,7 @@ const GameComponent = () => {
           }
         }
       });
-      coinsArray = coinsArray.filter(coin => !coin.collected);
+      coinsArray = coinsArray.filter((coin) => !coin.collected);
       while (coinsArray.length < numberOfCoins) {
         coinsArray.push(new Coin());
       }
@@ -616,22 +686,23 @@ const GameComponent = () => {
       drawSoundButton();
       ctx.fillStyle = 'black';
       ctx.font = '24px Arial';
-      ctx.fillText('Score: ' + score, 20, 30);
+      ctx.fillText('Score: ' + scoreOnCanvas, 20, 30);
       ctx.fillText('Roll: ' + numberOfRolls, 20, 60);
 
       gameFrame++;
       animationFrameId = window.requestAnimationFrame(render);
     };
 
-    // Reset game function
     const resetGame = () => {
       ctx.textAlign = 'start';
       ctx.fillStyle = 'black';
       ctx.font = '24px Arial';
       soundManager.stopAll();
       soundManager.play('roll');
-      gameOver = false;
-      score = 0;
+      isGameOverRef.current = false;
+      setGameOver(false);
+      scoreOnCanvas = 0;
+      setScore(0);
       numberOfRolls = 10;
       player.x = 0;
       player.y = 480;
@@ -649,44 +720,30 @@ const GameComponent = () => {
       render();
     };
 
-    // Start the game loop
     render();
 
-    // Cleanup on unmount
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
       canvas.removeEventListener('click', handleClick);
       window.cancelAnimationFrame(animationFrameId);
     };
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
   return (
     <div className="game-container">
-      <canvas ref={canvasRef} />
-  
+      <canvas ref={canvasRef} id="canvas1" />
+      {gameOver && score > highScore && (
+        <button
+          className="update-score-button"
+          onClick={handleUpdateScore}
+          disabled={isUpdating}
+        >
+          {isUpdating ? 'Updating...' : 'Update highscore on chain'}
+        </button>
+      )}
       <div className="panel leaderboard">
-        <h3>LEADERBOARD</h3>
-        <div className="score">
-          <span className="score-name">Player1</span>
-          <span className="score-value">1250</span>
-        </div>
-        <div className="score">
-          <span className="score-name">Player2</span>
-          <span className="score-value">980</span>
-        </div>
-        <div className="score">
-          <span className="score-name">Player3</span>
-          <span className="score-value">750</span>
-        </div>
-        <div className="score player-row">
-          <span className="score-name">YOU</span>
-          <span id="player-high-score" className="score-value">{highScore}</span>
-        </div>
-      </div>
-  
-      <div className="panel controls">
-        <h3>CONTROLS</h3>
+      <h3>CONTROLS</h3>
         <div className="control">
           <span className="key">↑</span> Jump (double tap for double jump)
         </div>
@@ -699,7 +756,6 @@ const GameComponent = () => {
       </div>
     </div>
   );
-  
 };
 
 export default GameComponent;
