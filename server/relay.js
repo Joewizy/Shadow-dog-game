@@ -30,7 +30,7 @@ if (result.error) {
   console.log('- File is missing or path is incorrect.');
   console.log('- File permissions prevent reading.');
   console.log('- Syntax error in .env.local (e.g., invalid format).');
-  process.exit(1); // Exit if .env.local fails to load, as it's critical
+  process.exit(1);
 } else {
   console.log('✔️ Successfully loaded .env.local');
 }
@@ -43,9 +43,14 @@ console.log('RPC_URL:', process.env.RPC_URL || 'undefined');
 console.log('PORT:', process.env.PORT || 'undefined');
 
 const app = express();
+
 app.use(cors({
-  origin: "http://localhost:3000",
-  methods: ["POST", "OPTIONS"],
+  origin: [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://japadog.netlify.app"
+  ],
+  methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type"]
 }));
 
