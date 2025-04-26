@@ -16,7 +16,7 @@ const Username = ({ onUsernameSet }) => {
       try {
         const provider = new ethers.BrowserProvider(window.ethereum, "any");
         const network = await provider.getNetwork();
-        if (network.chainId !== MONAD_TESTNET_CHAIN_ID && isInitialize) {
+        if (network.chainId !== MONAD_TESTNET_CHAIN_ID) {
           toast.error("⚡ Please switch to Monad Testnet first!");
           return;
         }
