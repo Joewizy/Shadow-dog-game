@@ -314,3 +314,30 @@ body, html {
     gap: 0.5rem;
   }
 }
+
+.footer {
+  text-align: left;
+  top: 20px;
+  left: 10px;
+  padding: 10px;
+  font-size: 14px;
+  color: #aaa;
+  display: flex;
+  position: absolute;
+  gap: 5px;
+  padding: 8px 15px;
+}
+
+.footer a {
+  color: #7c2be6;
+  text-decoration: none;
+  font-weight: 300;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+  color: white;
+}
+
+
+

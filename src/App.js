@@ -8,12 +8,14 @@ import { GameLeaderboard } from './components/leaderComponents/GameLeaderboard';
 import './App.css';
 import { Toaster } from 'react-hot-toast';
 import toast from 'react-hot-toast';
+import { ethers } from 'ethers';
 
 function App() {
   const { login, authenticated, ready, user, logout } = usePrivy();
   const { hasUsername, createUsernameGasless, isInitialize } = Web3();
   const walletAddress = user?.wallet?.address;
 
+  const MONAD_TESTNET_CHAIN_ID = 10143; 
   const [username, setUsername] = useState('');
   const [readyToPlay, setReadyToPlay] = useState(false);
   const [authStatus, setAuthStatus] = useState('initial'); // 'initial', 'connecting', 'wallet-needed', 'authenticated'
@@ -41,6 +43,22 @@ function App() {
     setAuthStatus('connecting');
     login();
   };
+
+  useEffect(() => {
+    const checkNetwork = async () => {
+      if (window.ethereum) {
+        const provider = new ethers.BrowserProvider(window.ethereum, "any");
+        const network = await provider.getNetwork();
+        if (network.chainId !== MONAD_TESTNET_CHAIN_ID && isInitialize) {
+          toast.error("Please switch your wallet to Monad Testnet!");
+        }
+      }
+    };
+
+    if (authStatus === 'authenticated') {
+      checkNetwork();
+    }
+  }, [authStatus]);
 
   useEffect(() => {
     if (ready && authenticated && walletAddress) {
@@ -170,6 +188,9 @@ function App() {
           </div>
         )}
       </main>
+      <footer className="footer">
+      <a href="https://twitter.com/BruceWayne82118" target="_blank" rel="noopener noreferrer">Joewizy🦇</a>
+    </footer>
     </div>
   );
 }
