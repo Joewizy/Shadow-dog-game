@@ -22,18 +22,19 @@ if (fs.existsSync(envPath)) {
   console.log('Ensure .env.local is in the project root (e.g., /Users/mac/game-ui/) and is readable.');
 }
 
+dotenv.config();
 // Load environment variables with error handling
-const result = dotenv.config({ path: envPath });
-if (result.error) {
-  console.error('❌ Error loading .env.local:', result.error.message);
-  console.log('Possible causes:');
-  console.log('- File is missing or path is incorrect.');
-  console.log('- File permissions prevent reading.');
-  console.log('- Syntax error in .env.local (e.g., invalid format).');
-  process.exit(1);
-} else {
-  console.log('✔️ Successfully loaded .env.local');
-}
+// const result = dotenv.config({ path: envPath });
+// if (result.error) {
+//   console.error('❌ Error loading .env.local:', result.error.message);
+//   console.log('Possible causes:');
+//   console.log('- File is missing or path is incorrect.');
+//   console.log('- File permissions prevent reading.');
+//   console.log('- Syntax error in .env.local (e.g., invalid format).');
+//   process.exit(1);
+// } else {
+//   console.log('✔️ Successfully loaded .env.local');
+// }
 
 // Debugging: Log environment variables to verify
 console.log('Environment Variables:');
