@@ -1,0 +1,3 @@
+src/contract/web3.js
+src/components/gameComponents/GameComponent.jsx
+src/components/leaderComponents/GameLeaderboard.jsx

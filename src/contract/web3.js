@@ -140,8 +140,8 @@ const Web3 = () => {
       );
       
       // Get API endpoint from environment or use default
-      const relayerEndpoint = 'http://localhost:4000/api/relay';
-      
+      const relayerEndpoint = process.env.REACT_APP_RELAYER_ENDPOINT || 'http://localhost:4000/api/relay';
+
       console.log("Sending to relayer:", {
         signature,
         request: requestWithBigIntAsString
