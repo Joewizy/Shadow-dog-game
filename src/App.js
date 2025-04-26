@@ -46,19 +46,24 @@ function App() {
 
   useEffect(() => {
     const checkNetwork = async () => {
-      if (window.ethereum) {
-        const provider = new ethers.BrowserProvider(window.ethereum, "any");
-        const network = await provider.getNetwork();
-        if (network.chainId !== MONAD_TESTNET_CHAIN_ID && isInitialize) {
-          toast.error("Please switch your wallet to Monad Testnet!");
-        }
+      if (!window.ethereum || !isInitialize) return;
+  
+      const hex = await window.ethereum.request({ method: 'eth_chainId' });
+      const chainId = Number(hex);
+      console.log("Network chainId:", chainId);
+  
+      if (chainId !== MONAD_TESTNET_CHAIN_ID) {
+        toast.warning(
+          `⚡ You’re on chain ${chainId}, expected Monad Testnet (${MONAD_TESTNET_CHAIN_ID}).`
+        );
       }
     };
-
+  
     if (authStatus === 'authenticated') {
       checkNetwork();
     }
-  }, [authStatus]);
+  }, [authStatus, isInitialize]);
+  
 
   useEffect(() => {
     if (ready && authenticated && walletAddress) {
